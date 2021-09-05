@@ -81,7 +81,7 @@ class MainPrompt(Cmd):
         elif inp == "close":
             self.secure_storage.deactivate()
 
-    def do_WIFI(self, inp: str) -> None:
+    def do_wifi(self, inp: str) -> None:
         """
         Set up the WiFi connection.
 
