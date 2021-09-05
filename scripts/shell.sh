@@ -4,4 +4,4 @@
 
 cd /opt/usbhonk/
 . /opt/usbhonk/venv/bin/activate
-python3 -m usbhonk.main
+python3 -m usbhonk
