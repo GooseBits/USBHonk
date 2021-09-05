@@ -2,10 +2,11 @@
 import re
 import time
 import subprocess
+from typing import List
 
 
 class WPAException(Exception):
-    """Exception class thrown by :class:`WPACLIInterface` on error."""
+    """Exception class thrown by :class:`WPAConfig` on error."""
 
 
 class Network:
@@ -30,22 +31,24 @@ class Network:
         f" signal={self.signal} encrypted={self.encrypted})"
 
 
-class WPACliInterface:
-    """Interface to wpa_cli."""
+class WPAConfig:
+    """Interface to wpa_cli used to configure wifi access."""
 
     def __init__(self, iface="wlan0"):
         self.iface = iface
 
-    def connect(self, network) -> dict:
+    def connect(self, network: str, password: str) -> dict:
         """Connect to a network."""
-        if network.encrypted:
-            print("Cannot connect to encrypted network")
-            return None
-        self.disconnect()
+        self.disconnect()  # Make sure we're not connected
 
         net_id = self._run_wpa_cli(["add_network"])
         self._run_wpa_cli(["set_network", net_id, "ssid", f'"{network.ssid}"'])
-        self._run_wpa_cli(["set_network", net_id, "key_mgmt", "NONE"])
+
+        if password:
+            self._run_wpa_cli(["set_network", net_id, password])
+        else:
+            self._run_wpa_cli(["set_network", net_id, "key_mgmt", "NONE"])
+
         self._run_wpa_cli(["enable_network", net_id])
         self._run_wpa_cli(["save_config"])
         self._run_wpa_cli(["reconfigure"])
@@ -65,7 +68,6 @@ class WPACliInterface:
             elapsed = time.time() - start_time
             if elapsed > 30:
                 return None
-
 
     def disconnect(self):
         """Remove all networks from the wpa config."""
@@ -87,7 +89,7 @@ class WPACliInterface:
                 result[key] = val
         return result
 
-    def scan(self) -> list:
+    def scan(self) -> List[Network]:
         """Scan for wireless networks."""
         self._run_wpa_cli(["scan"])
         time.sleep(5)
