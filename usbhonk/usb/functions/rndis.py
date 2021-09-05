@@ -1,4 +1,4 @@
-from .function import USBFunction
+from usbhonk.usb.functions.function import USBFunction
 
 class RNDIS(USBFunction):
     """ Network adapter supported by Windows """

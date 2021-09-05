@@ -1,11 +1,12 @@
-from .functions.function import USBFunction
+from usbhonk.usb.functions.function import USBFunction
+from usbhonk.usb.configfs_util import ConfigFSWrapper
 
 from pathlib import Path
 
-class USBGadget:
+class USBGadget(ConfigFSWrapper):
     """ USB Gadget Base Class """
     def __init__(self, gadget_name):
-        self.path = Path(f"/sys/kernel/config/usb_gadget/{gadget_name}")
+        ConfigFSWrapper.__init__(self, Path(f"/sys/kernel/config/usb_gadget/{gadget_name}"))
         self.path.mkdir(parents=True)
         self.__functions = []
 
@@ -18,25 +19,6 @@ class USBGadget:
         func = func_class(self.path, name)
         self.__functions.append(func)
         return func
-
-    def get_bool_val(self, name : str) -> bool:
-        return self.get_str_val(name) == "1"
-
-    def set_bool_val(self, name : str, value : bool):
-        p = self.path / name
-        if value:
-            self.set_str_val(name, "1")
-        else:
-            self.set_str_val(name, "0")
-
-    def get_str_val(self, name : str) -> str:
-        p = self.path / name
-        return p.open().readline().strip()
-
-    def set_str_val(self, name : str, value : bool):
-        p = self.path / name
-        with p.open() as f:
-            p.write(value)
 
     @property
     def active(self) -> bool:

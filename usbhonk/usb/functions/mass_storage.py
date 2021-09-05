@@ -1,32 +1,15 @@
-from .function import USBFunction
+from usbhonk.usb.functions.function import USBFunction
+from usbhonk.usb.configfs_util import ConfigFSWrapper
 
 from pathlib import Path
 
-class LUN:
+class LUN(ConfigFSWrapper):
     """ An individual LUN as part of a mass storage device"""
 
     def __init__(self, function_path : Path, id : int):
-        self.path = function_path / f"lun.{id}"
+        ConfigFSWrapper.__init__(self, function_path / f"lun.{id}")
         self.path.mkdir(parents=True, exist_ok=True)
-
-    def get_bool_val(self, name : str) -> bool:
-        return self.get_str_val(name) == "1"
-
-    def set_bool_val(self, name : str, value : bool):
-        p = self.path / name
-        if value:
-            self.set_str_val(name, "1")
-        else:
-            self.set_str_val(name, "0")
-
-    def get_str_val(self, name : str) -> str:
-        p = self.path / name
-        return p.open().readline().strip()
-
-    def set_str_val(self, name : str, value : bool):
-        p = self.path / name
-        with p.open() as f:
-            p.write(value)
+        self.id = id
 
     @property
     def cdrom(self) -> bool:
@@ -93,18 +76,16 @@ class MassStorage(USBFunction):
     """ Emulated mass storage """
 
     def __init__(self, gadget_path, rndis_name):
-        super().__init__(gadget_path, f"mass_storage.{rndis_name}")
+        USBFunction.__init__(self, gadget_path, f"mass_storage.{rndis_name}")
         # lun.0 is populated by default
-        self.__luns = [LUN(0)]
+        self.__luns = [LUN(self.path, 0)]
 
-    def add_lun(self):
+    def add_lun(self) -> LUN:
         """ Add a new LUN """
         id = len(self.__luns)
-        self.__luns.append(LUN(self.path, id))
-
-    def lun(self, idx : int) -> LUN:
-        """ Get a LUN """
-        return self.__luns[idx]
+        lun = LUN(self.path, id)
+        self.__luns.append(lun)
+        return lun
 
     @property
     def stall(self) -> bool:

@@ -53,6 +53,7 @@ then
 fi
 
 ## Build the wheel
+## TODO: Clean first so that there can't be multiple wheels?
 pushd ..
 python3 setup.py bdist_wheel --universal
 popd
