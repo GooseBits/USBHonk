@@ -1,0 +1,10 @@
+pytest
+mypy
+pycodestyle
+coverage
+tox
+pydocstyle
+wheel
+setuptools
+pylint
+pytest-coverage
