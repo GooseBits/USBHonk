@@ -94,6 +94,11 @@ class MainPrompt(Cmd):
             disconnect
             status
         """
+        if not inp:
+            print("A command is required: ")
+            print("scan\nconnect <ssid>\ndisconnect\nstatus")
+            return
+
         toks = inp.split()
         cmd = toks[0]
         args = toks[1:]
