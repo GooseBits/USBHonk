@@ -37,15 +37,19 @@ class WPAConfig:
     def __init__(self, iface="wlan0"):
         self.iface = iface
 
-    def connect(self, network: str, password: str) -> dict:
+    def connect(self, ssid: str, password: str) -> dict:
         """Connect to a network."""
         self.disconnect()  # Make sure we're not connected
 
         net_id = self._run_wpa_cli(["add_network"])
-        self._run_wpa_cli(["set_network", net_id, "ssid", f'"{network.ssid}"'])
+        # You need quotes around the ssid (hopefully it doesn't contain quotes)
+        # TODO: idk how to fix the quote thing yet
+        self._run_wpa_cli(["set_network", net_id, "ssid", f'"{ssid}"'])
 
         if password:
-            self._run_wpa_cli(["set_network", net_id, password])
+            # You need quotes around the password (hopefully the password doesn't contain a quote)
+            # TODO: Use wpa_passphrase to encode the password to get around weird password characters
+            self._run_wpa_cli(["set_network", net_id, "psk", f'"{password}"'])
         else:
             self._run_wpa_cli(["set_network", net_id, "key_mgmt", "NONE"])
 
@@ -66,7 +70,7 @@ class WPAConfig:
 
             # Give up eventually
             elapsed = time.time() - start_time
-            if elapsed > 30:
+            if elapsed > 20:
                 return None
 
     def disconnect(self):
@@ -109,7 +113,7 @@ class WPAConfig:
 
     def _run_wpa_cli(self, command) -> str:
         """Run a wpa_cli command and return the output."""
-        args = ["/sbin/wpa_cli", "-i", self.iface]
+        args = ["/usr/bin/sudo", "/sbin/wpa_cli", "-i", self.iface]
         args.extend(command)
         result = subprocess.run(args=args,
             capture_output=True, text=True, check=False

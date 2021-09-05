@@ -44,7 +44,7 @@ class MainPrompt(Cmd):
 
         :raises CalledProcessError: If we can't run /bin/bash
         """
-        subprocess.check_call(["/bin/bash"], shell=True)
+        subprocess.run("/bin/bash -i", shell=True, check=True)
 
     def do_secure_storage(self, inp: str) -> None:
         """
@@ -94,6 +94,7 @@ class MainPrompt(Cmd):
             disconnect
             status
         """
+        # TODO:
         if not inp:
             print("A command is required: ")
             print("scan\nconnect <ssid>\ndisconnect\nstatus")
@@ -119,7 +120,13 @@ class MainPrompt(Cmd):
             passwd = getpass(prompt="Network Password: ")
             if not passwd:
                 print("Warning. No password specified. Hopefully an open network...")
-            result = self.wpa_config.connect(args[0], passwd)
+
+            open_rw()
+            try:
+                result = self.wpa_config.connect(args[0], passwd)
+            finally:
+                close_rw()
+
             if not result:
                 print("Failed to connect")
             else:
