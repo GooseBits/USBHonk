@@ -5,7 +5,8 @@ from getpass import getpass
 
 from cmd import Cmd
 
-from .secure_storage import SecureStorage
+from usbhonk.secure_storage import SecureStorage
+from usbhonk.wifi.wpa import WPAConfig
 
 
 def open_rw():
@@ -35,16 +36,17 @@ class MainPrompt(Cmd):
     prompt = "USBHonk> "
     intro = "Welcome! Type ? to list commands"
     secure_storage = SecureStorage("/dev/mmcblk0p3", "secure")
+    wpa_config = WPAConfig()
 
-    def do_shell(self, _inp: str):
+    def do_shell(self, _inp: str) -> None:
         """
         Drop to a shell.
 
         :raises CalledProcessError: If we can't run /bin/bash
         """
-        subprocess.check_call(["/bin/bash"], shell=True)
+        subprocess.run("/bin/bash -i", shell=True, check=True)
 
-    def do_secure_storage(self, inp: str):
+    def do_secure_storage(self, inp: str) -> None:
         """
         Set up the secure storage.
 
@@ -79,18 +81,70 @@ class MainPrompt(Cmd):
         elif inp == "close":
             self.secure_storage.deactivate()
 
-    def do_WIFI(self, _inp: str):
-        """Wifi setup."""
+    def do_wifi(self, inp: str) -> None:
+        """
+        Set up the WiFi connection.
 
-    def do_EOF(self, inp: str):
+        WIFI <command> [ARG-1, ..., ARG-N]
+
+        Configure Wifi
+        Valid commands:
+            scan
+            connect <ssid>
+            disconnect
+            status
+        """
+        # TODO:
+        if not inp:
+            print("A command is required: ")
+            print("scan\nconnect <ssid>\ndisconnect\nstatus")
+            return
+
+        toks = inp.split()
+        cmd = toks[0]
+        args = toks[1:]
+
+        if len(args) > 1:
+            print("No commands take more than one argument. Too many args.")
+            return
+
+        if cmd == "connect" and not args:
+            print("connect requires 1 argument, the name of the network to connect to.")
+            return
+
+        # It's prob. valid at this point
+        if cmd == "scan":
+            for network in self.wpa_config.scan():
+                print(network)
+        elif cmd == "connect":
+            passwd = getpass(prompt="Network Password: ")
+            if not passwd:
+                print("Warning. No password specified. Hopefully an open network...")
+
+            open_rw()
+            try:
+                result = self.wpa_config.connect(args[0], passwd)
+            finally:
+                close_rw()
+
+            if not result:
+                print("Failed to connect")
+            else:
+                print(result)
+        elif cmd == "disconnect":
+            self.wpa_config.disconnect()
+        elif cmd == "status":
+            print(self.wpa_config.status())
+
+    def do_EOF(self, inp: str) -> bool:
         """Handle end-of-file (exit the shell)."""
         return self.do_exit(inp)
 
-    def do_quit(self, inp: str):
+    def do_quit(self, inp: str) -> bool:
         """Handle quit (exit the shell)."""
         return self.do_exit(inp)
 
-    def do_exit(self, _inp: str):
+    def do_exit(self, _inp: str) -> bool:
         """Exit the shell."""
         print("Bye")
         return True

@@ -1,2 +1,1 @@
-pycmd
-# pypsi TODO: Switch to pypsi
+pypsi
