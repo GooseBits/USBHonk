@@ -33,6 +33,7 @@ check_commands () {
 }
 
 get_variables () {
+  SECTOR_ALIGNMENT="2048"
   ROOT_PART_TARGET_SIZE="$((8 * (1024 * 1024 * 1024)))"
   ROOT_PART_DEV=$(findmnt / -o source -n)
   ROOT_PART_NAME=$(echo "$ROOT_PART_DEV" | cut -d "/" -f 3)
@@ -52,6 +53,11 @@ get_variables () {
 
   ROOT_DEV_SIZE=$(cat "/sys/block/${ROOT_DEV_NAME}/size")
   TARGET_END=$((ROOT_PART_START + ROOT_PART_TARGET_SECTORS))
+
+  # Align the target end and subtract one
+  # This way the next partition starts aligned
+  ALIGN_OFFSET=$((TARGET_END % SECTOR_ALIGNMENT))
+  TARGET_END=$((TARGET_END - ALIGN_OFFSET - 1))
 
   PARTITION_TABLE=$(parted -m "$ROOT_DEV" unit s print | tr -d 's')
 
@@ -135,6 +141,11 @@ main () {
     return 1
   fi
 
+  if ! parted -m "$ROOT_DEV" u s mkpart primary fat32 "$((TARGET_END+1))" "$((ROOT_DEV_SIZE - 1))"; then
+    FAIL_REASON="User partition create failed"
+    return 1
+  fi
+
   fix_partuuid
 
   return 0
@@ -164,8 +175,8 @@ if ! check_commands; then
 fi
 
 if main; then
-  whiptail --infobox "Resized root filesystem. Rebooting in 5 seconds..." 20 60
-  sleep 5
+  whiptail --infobox "Resized root filesystem. Rebooting in 2 seconds..." 20 60
+  sleep 2
 else
   whiptail --msgbox "Could not expand filesystem, please try raspi-config or rc_gui.\n${FAIL_REASON}" 20 60
   sleep 5

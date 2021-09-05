@@ -1,9 +1,13 @@
 #!/bin/bash -e
 
 ##
-## Modified to remount root rw during execution
+## Enable an SSH server
 ##
+systemctl enable ssh
 
+#
+# Modified to remount root rw during execution
+#
 cat << 'EOF' > /lib/systemd/system/regenerate_ssh_host_keys.service
 [Unit]
 Description=Regenerate SSH host keys

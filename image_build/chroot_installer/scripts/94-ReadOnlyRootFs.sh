@@ -3,7 +3,7 @@
 echo "Configuring a read-only rootfs..."
 
 # Remove some packages
-apt-get -y remove --purge triggerhappy logrotate dphys-swapfile
+apt-get -y remove --purge triggerhappy dphys-swapfile
 
 # Remove some startup scripts and timers
 systemctl disable bootlogs

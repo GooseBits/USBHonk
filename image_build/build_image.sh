@@ -99,7 +99,7 @@ rmdir $MOUNT_PATH
 
 ## Shrink the root filesystem to the minimum size
 e2fsck -f "$ROOT_PARTITION"
-resize2fs -M "$ROOT_PARTITION"
+resize2fs -M "$ROOT_PARTITION" > /dev/null
 ROOTFS_INFO=$(tune2fs -l "$ROOT_PARTITION")
 BLOCK_SIZE=$(echo "$ROOTFS_INFO" |grep "^Block size"|grep -Po "[0-9]+")
 BLOCK_COUNT=$(echo "$ROOTFS_INFO" |grep "^Block count"|grep -Po "[0-9]+")

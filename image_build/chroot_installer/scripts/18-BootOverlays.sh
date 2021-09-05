@@ -1,3 +1,6 @@
 #!/bin/bash -e
 
-echo "dtoverlay=dwc2,dr_mode=peripheral" >> /boot/config.txt
+cat << EOF >> /boot/config.txt
+dtoverlay=dwc2,dr_mode=peripheral
+gpu_mem=16
+EOF
