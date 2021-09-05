@@ -2,6 +2,5 @@
 
 # Wrapper script for the goose user's shell
 
-cd /opt/usbhonk/
-. /opt/usbhonk/venv/bin/activate
+. /opt/usbhonk/bin/activate
 python3 -m usbhonk
