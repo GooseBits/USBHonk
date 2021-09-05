@@ -20,7 +20,7 @@ if [ $EUID != 0 ]; then
     exit 1
 fi
 
-DEPENDENCIES=( kpartx qemu-arm-static unzip mkfs.ext4 resize2fs e2fsck tune2fs xz wget zerofree truncate sfdisk )
+DEPENDENCIES=( kpartx qemu-arm-static unzip mkfs.ext4 resize2fs e2fsck tune2fs xz wget zerofree truncate sfdisk python3)
 
 HAS_DEPS=1
 for i in "${DEPENDENCIES[@]}"
@@ -51,6 +51,11 @@ then
     echo "Extracting Raspberry Pi OS Image..."
     unzip -q "./$RPI_ZIP"
 fi
+
+## Build the wheel
+pushd ..
+python3 setup.py bdist_wheel --universal
+popd
 
 ## Copy the image to the target
 cp -f "$RPI_IMAGE" "$OUTPUT_FILE"
@@ -83,6 +88,9 @@ cp -r chroot_installer $MOUNT_PATH/tmp/
 
 ## Copy qemu-arm-static into the target
 cp $(which qemu-arm-static) $MOUNT_PATH/tmp/chroot_installer/
+
+## Copy our wheel into the target
+cp ../dist/usbhonk*.whl $MOUNT_PATH/tmp/chroot_installer/
 
 ## Enter the ARM chroot and run the installation
 chroot $MOUNT_PATH /tmp/chroot_installer/qemu-arm-static /bin/bash /tmp/chroot_installer/init.sh

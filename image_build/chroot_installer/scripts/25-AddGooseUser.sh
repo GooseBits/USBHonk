@@ -3,17 +3,17 @@
 ##
 ## Configure the Goose user
 ##
-USER="goose"
-PASSWORD="honk"
+GOOSE_USER="goose"
+GOOSE_PASSWORD="honk"
 
-useradd --create-home --groups adm,dialout,sudo --shell /opt/usbhonk/scripts/shell.sh $USER
-echo "$USER:$PASSWORD" | chpasswd
+useradd --create-home --groups adm,dialout,sudo $GOOSE_USER
+echo "$GOOSE_USER:$GOOSE_PASSWORD" | chpasswd
 
 # Disable the login banner
-touch /home/$USER/.hushlogin
-chown $USER:$USER /home/goose/.hushlogin
+touch /home/$GOOSE_USER/.hushlogin
+chown $GOOSE_USER:$GOOSE_USER /home/goose/.hushlogin
 
 # Enable sudo with no password for the user
-cat << EOF > /etc/sudoers.d/10_${USER}_nopasswd
-$USER ALL=(ALL) NOPASSWD: ALL
+cat << EOF > /etc/sudoers.d/10_${GOOSE_USER}_nopasswd
+$GOOSE_USER ALL=(ALL) NOPASSWD: ALL
 EOF
