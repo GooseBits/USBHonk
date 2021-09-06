@@ -29,3 +29,25 @@ chmod +x "${VENV}/bin/shell.sh"
 
 # Adjust the shell for the goose user
 usermod --shell "${VENV}/bin/shell.sh" "$GOOSE_USER"
+
+# Startup script
+cat << 'EOF' > /lib/systemd/system/goosehonk.service
+[Unit]
+Description=Goosehonk default gadget
+
+[Service]
+Type=oneshot
+# Detach any existing devices
+ExecStartPre=/usr/bin/find /sys/kernel/config/usb_gadget/ -name UDC -exec sh -c 'echo "" > {} ' \; 2&>1 > /dev/null|| true
+ExecStart=/opt/goosehonk/bin/python3 -m usbhonk.usb.gadgets.default_gadget --activate
+ExecStartPost=/usr/bin/systemctl start serial-getty@ttyGS0.service
+
+ExecStop=/usr/bin/systemctl stop serial-getty@ttyGS0.service
+ExecStop=/opt/goosehonk/bin/python3 -m usbhonk.usb.gadgets.default_gadget --deactivate
+RemainAfterExit=true
+
+[Install]
+WantedBy=basic.target
+EOF
+
+/usr/bin/systemctl enable goosehonk.service

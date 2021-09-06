@@ -77,15 +77,10 @@ class MassStorage(USBFunction):
 
     def __init__(self, gadget_path, rndis_name):
         USBFunction.__init__(self, gadget_path, f"mass_storage.{rndis_name}")
-        # lun.0 is populated by default
-        self.__luns = [LUN(self.path, 0)]
 
-    def add_lun(self) -> LUN:
-        """ Add a new LUN """
-        id = len(self.__luns)
-        lun = LUN(self.path, id)
-        self.__luns.append(lun)
-        return lun
+    def lun(self, idx : int) -> LUN:
+        """ Get a LUN """
+        return LUN(self.path, idx)
 
     @property
     def stall(self) -> bool:

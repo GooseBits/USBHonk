@@ -15,16 +15,15 @@ class ConfigFSWrapper:
             self.set_str_val(name, "0")
 
     def get_int_val(self, name : str) -> int:
-        return int(self.get_str_val(name))
+        return int(self.get_str_val(name), 0)
 
     def set_int_val(self, name : str, value : int):
         self.set_str_val(name, str(value))
 
     def get_str_val(self, name : str) -> str:
         p = self.path / name
-        return p.open().readline().strip()
+        return p.read_text().strip()
 
-    def set_str_val(self, name : str, value : bool):
+    def set_str_val(self, name : str, value : str):
         p = self.path / name
-        with p.open() as f:
-            f.write(value)
+        p.write_text(value)

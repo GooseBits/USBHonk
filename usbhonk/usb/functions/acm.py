@@ -10,9 +10,3 @@ class ACM(USBFunction):
     def port_num(self) -> int:
         """ Get the port number """
         return self.get_int_val("port_num")
-
-    @port_num.setter
-    def port_num(self, value : int):
-        """ Set the port number """
-        self.set_int_val("port_num", value)
-
