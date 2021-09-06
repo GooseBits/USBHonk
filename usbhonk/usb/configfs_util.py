@@ -26,4 +26,9 @@ class ConfigFSWrapper:
 
     def set_str_val(self, name : str, value : str):
         p = self.path / name
-        p.write_text(value)
+        if value:
+            p.write_text(value)
+        else:
+            # Nothing happens if the string is completely empty
+            # Adding a newline fixes it
+            p.write_text("\n")

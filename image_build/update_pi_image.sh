@@ -1,4 +1,10 @@
 #!/usr/bin/env bash
+
+# This is a script to update an existing raspberry pi .img file's packages
+# The purpose is to aid in development, so that build_image.sh doesn't have
+# to start from zero with each build. Unless you are a developer, frequently
+# creating and testing images, don't bother.
+
 set -e
 
 # Run from the directory of the script
@@ -11,16 +17,15 @@ RPI_ZIP_URL="https://downloads.raspberrypi.org/raspios_lite_armhf/images/raspios
 RPI_ZIP_HASH="c5dad159a2775c687e9281b1a0e586f7471690ae28f2f2282c90e7d59f64273c"
 RPI_ZIP=$(basename $RPI_ZIP_URL)
 RPI_IMAGE="${RPI_ZIP/.zip/.img}"
-OUTPUT_FILE="usbhonk.img"
-MOUNT_PATH="/tmp/usbhonk_rootfs"
-TEMP_IMAGE_SIZE="8G" # Just needs to be big enough for initial image, final image will be truncated
+MOUNT_PATH="/tmp/usbhonk_pi_rootfs"
+TEMP_IMAGE_SIZE="4G" # Just needs to be big enough for initial image, final image will be truncated
 
 if [ $EUID != 0 ]; then
     echo "Please run as root"
     exit 1
 fi
 
-DEPENDENCIES=( kpartx qemu-arm-static unzip mkfs.ext4 resize2fs e2fsck tune2fs xz wget zerofree truncate sfdisk python3)
+DEPENDENCIES=( kpartx qemu-arm-static unzip mkfs.ext4 resize2fs e2fsck tune2fs wget zerofree truncate sfdisk)
 
 HAS_DEPS=1
 for i in "${DEPENDENCIES[@]}"
@@ -52,23 +57,14 @@ then
     unzip -q "./$RPI_ZIP"
 fi
 
-## Build the wheel
-## TODO: Clean first so that there can't be multiple wheels?
-pushd ..
-python3 setup.py bdist_wheel --universal
-popd
-
-## Copy the image to the target
-cp -f "$RPI_IMAGE" "$OUTPUT_FILE"
-
 ## Resize the target image
-truncate -s "$TEMP_IMAGE_SIZE" "$OUTPUT_FILE"
+truncate -s "$TEMP_IMAGE_SIZE" "$RPI_IMAGE"
 
 ## Grow the rootfs partition to the max
-echo ", +" | sfdisk -q -N2 "$OUTPUT_FILE"
+echo ", +" | sfdisk -q -N2 "$RPI_IMAGE"
 
 ## Attach the image
-KPARTX_OUTPUT=$(kpartx -av "$OUTPUT_FILE")
+KPARTX_OUTPUT=$(kpartx -av "$RPI_IMAGE")
 
 DEVICE=/dev/$(echo "$KPARTX_OUTPUT"|grep -Po loop[0-9]|head -n 1)
 BOOT_PARTITION=/dev/mapper/$(echo "$KPARTX_OUTPUT"|grep -Po loop[0-9]+p1)
@@ -88,17 +84,14 @@ mount $BOOT_PARTITION $MOUNT_PATH/boot
 cp -r chroot_installer $MOUNT_PATH/tmp/
 
 ## Copy qemu-arm-static into the target
-cp $(which qemu-arm-static) $MOUNT_PATH/tmp/chroot_installer/
+cp $(which qemu-arm-static) $MOUNT_PATH/tmp/
 
-## Copy our wheel into the target
-cp ../dist/usbhonk*.whl $MOUNT_PATH/tmp/chroot_installer/
+## Enter the ARM chroot and run the update
+chroot $MOUNT_PATH /tmp/qemu-arm-static /bin/bash -c "apt-get update && apt-get upgrade -y && apt-get autoremove -y --purge && apt-get clean"
 
-## Enter the ARM chroot and run the installation
-chroot $MOUNT_PATH /tmp/chroot_installer/qemu-arm-static /bin/bash /tmp/chroot_installer/init.sh
-
-## Remove install files
-echo "Cleaning up installation files..."
-rm -rf $MOUNT_PATH/tmp/chroot_installer
+## Remove temporary files
+echo "Cleaning up temporary files..."
+rm -rf $MOUNT_PATH/tmp/arm
 
 ## Zero free space in /boot
 echo "Zeroing free space in /boot"
@@ -122,7 +115,7 @@ ROOTFS_SIZE=$((BLOCK_COUNT * BLOCK_SIZE))
 ROOTFS_SECTORS=$((ROOTFS_SIZE / SECTOR_SIZE))
 
 ## Shrink the rootfs partition to the minimum
-echo ", $ROOTFS_SECTORS" | sfdisk -q -N2 "$OUTPUT_FILE"
+echo ", $ROOTFS_SECTORS" | sfdisk -q -N2 "$RPI_IMAGE"
 
 ## Run ZeroFree so the image compresses better
 echo "Zeroing free space..."
@@ -131,17 +124,13 @@ sync
 
 ## Remove mappings
 echo "Cleaning up mappings..."
-kpartx -d "$OUTPUT_FILE"
+kpartx -d "$RPI_IMAGE"
 
 ## Truncate the image
 echo "Truncating image..."
-SFDISK_OUTPUT=$(sfdisk -J "$OUTPUT_FILE")
+SFDISK_OUTPUT=$(sfdisk -J "$RPI_IMAGE")
 ROOTFS_START=$(echo "$SFDISK_OUTPUT" | jq .partitiontable.partitions[1].start)
 IMAGE_SIZE=$(((ROOTFS_START + ROOTFS_SECTORS) * SECTOR_SIZE))
-truncate -s "$IMAGE_SIZE" "$OUTPUT_FILE"
-
-# Compress the image for release
-#echo "Compressing image for release..."
-#xz -f -k -T0 --arm -9 "$OUTPUT_FILE"
+truncate -s "$IMAGE_SIZE" "$RPI_IMAGE"
 
 echo "Success! HONK!"

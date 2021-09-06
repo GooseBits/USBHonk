@@ -1,6 +1,10 @@
 #!/bin/bash -e
 
-cat << 'EOF' >> /etc/modules.conf
+cat << 'EOF' >> /etc/modules-load.d/usbhonk.conf
+##
+## Modules required for usbhonk to work properly
+##
+
 # Act as a composite USB device
 libcomposite
 
