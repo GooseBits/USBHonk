@@ -1,4 +1,31 @@
+from pathlib import Path
+
+from usbhonk.usb.configfs_util import ConfigFSWrapper
 from usbhonk.usb.functions.function import USBFunction
+
+
+class OSDesc(ConfigFSWrapper):
+    """ OS Descriptor for RNDIS """
+
+    def __init__(self, base_path: Path):
+        ConfigFSWrapper.__init__(self, base_path / "os_desc" / "interface.rndis")
+
+    @property
+    def compatible_id(self) -> str:
+        return self.get_str_val("compatible_id")
+
+    @compatible_id.setter
+    def compatible_id(self, value: str) -> None:
+        self.set_str_val("compatible_id", value)
+
+    @property
+    def sub_compatible_id(self) -> str:
+        return self.get_str_val("sub_compatible_id")
+
+    @sub_compatible_id.setter
+    def sub_compatible_id(self, value: str) -> None:
+        self.set_str_val("sub_compatible_id", value)
+
 
 class RNDIS(USBFunction):
     """ Network adapter supported by Windows """
@@ -7,12 +34,16 @@ class RNDIS(USBFunction):
         super().__init__(gadget_path, f"rndis.{rndis_name}")
 
     @property
+    def os_desc(self) -> OSDesc:
+        return OSDesc(self.path)
+
+    @property
     def device_class(self) -> int:
         """ Get the device class """
         return self.get_int_val("class")
 
     @device_class.setter
-    def device_class(self, value : int):
+    def device_class(self, value: int):
         """ Set the device class """
         return self.set_int_val("class", value)
 
@@ -32,7 +63,7 @@ class RNDIS(USBFunction):
         return self.get_str_val("host_addr")
 
     @host_addr.setter
-    def host_addr(self, addr) :
+    def host_addr(self, addr):
         """ Set the host MAC address """
         self.set_str_val("host_addr", addr)
 
@@ -47,7 +78,7 @@ class RNDIS(USBFunction):
         return self.get_int_val("protocol")
 
     @protocol.setter
-    def protocol(self, value : int):
+    def protocol(self, value: int):
         """ Set the device protocol """
         return self.set_int_val("protocol", value)
 
@@ -57,7 +88,7 @@ class RNDIS(USBFunction):
         return self.get_int_val("qmult")
 
     @qmult.setter
-    def qmult(self, value : int):
+    def qmult(self, value: int):
         """ Set the qmult value (TODO What is this) """
         return self.set_int_val("qmult", value)
 
@@ -67,6 +98,6 @@ class RNDIS(USBFunction):
         return self.get_int_val("subclass")
 
     @device_subclass.setter
-    def device_subclass(self, value : int):
+    def device_subclass(self, value: int):
         """ Set the device subclass """
         return self.set_int_val("subclass", value)

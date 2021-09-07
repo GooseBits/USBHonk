@@ -2,4 +2,4 @@
 
 echo "Installing some packages..."
 
-apt-get install -y vim jq git 
+apt-get install -y vim jq git nmap

@@ -1,5 +1,6 @@
 from usbhonk.usb.functions.function import USBFunction
 
+
 class ACM(USBFunction):
     """ ACM Serial Device """
 

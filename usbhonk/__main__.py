@@ -5,6 +5,7 @@ from getpass import getpass
 
 from cmd import Cmd
 
+from usbhonk.bluetooth.bluetooth import Bluetooth
 from usbhonk.usb.gadgets.default_gadget import DefaultGadget
 from usbhonk.secure_storage import SecureStorage
 from usbhonk.wifi.wpa import WPAConfig
@@ -36,9 +37,10 @@ class MainPrompt(Cmd):
 
     prompt = "USBHonk> "
     intro = "Welcome! Type ? to list commands"
-    secure_storage = SecureStorage("/dev/mmcblk0p3", "secure")
-    wpa_config = WPAConfig()
+    secure_storage = SecureStorage(path="/dev/mmcblk0p3", name="secure")
+    wpa_config = WPAConfig(iface="wlan0")
     default_gadget = DefaultGadget()
+    bluetooth = Bluetooth(device="hci0")
 
     def do_shell(self, _inp: str) -> None:
         """
@@ -94,6 +96,38 @@ class MainPrompt(Cmd):
             self.secure_storage.deactivate()
         else:
             print("Unknown subcommand")
+
+    def do_bluetooth(self, inp: str) -> None:
+        """
+        Configure bluetooth connectivity
+
+        bluetooth <command>
+
+        Configure Bluetooth
+        Valid commands:
+            pair
+        """
+        if not inp:
+            print("A command is required: ")
+            print("pair")
+            return
+
+        toks = inp.split()
+        cmd = toks[0]
+        args = toks[1:]
+
+        if len(args) > 0:
+            print("No commands take arguments. Too many args.")
+            return
+
+        if cmd == "pair":
+            print("Starting Bluetooth pairing...")
+            open_rw()
+            try:
+                self.bluetooth.pair()
+            finally:
+                close_rw()
+
 
     def do_wifi(self, inp: str) -> None:
         """

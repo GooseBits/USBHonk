@@ -7,10 +7,19 @@
 VENV="/opt/usbhonk"
 
 # Install dependencies
-apt-get install -y python3-pip python3-venv cryptsetup
+# python3-pip and python3-venv needed for our virtual environment
+# cryptsetup needed for LUKS stuff
+#
+# python3-dbus and python3-gi are needed for our bluetooth agent.
+# 
+apt-get install -y python3-pip python3-venv python3-pydbus python3-gi cryptsetup
+# libglib2.0-dev libgirepository1.0-dev libcairo2-dev
 
-# Create the venv and activate it
-python3 -m venv "$VENV"
+# Create the venv and activate it.
+# --system-site-packages is used because pydbus needs
+# several dev packages and has to be compiled. Easier
+# to just allow the system packages in.
+python3 -m venv --system-site-packages "$VENV"
 . ${VENV}/bin/activate
 
 # Install the wheel

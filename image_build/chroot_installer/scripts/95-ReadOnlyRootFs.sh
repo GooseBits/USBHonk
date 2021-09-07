@@ -17,6 +17,9 @@ systemctl disable man-db.timer
 apt-get install -y busybox-syslogd
 dpkg --purge rsyslog
 
+# Make rootfs read-only in /etc/fstab
+sed -i 's~defaults,noatime~defaults,noatime,ro~g' /etc/fstab
+
 # Add tmpfs entries to fstab
 cat << 'EOF' >> /etc/fstab
 
@@ -45,17 +48,18 @@ Description=Mount rootfs rw
 # Add first-boot rw services here
 Before=firstboot_ro.service
 Before=regenerate_ssh_host_keys.service
+Before=bluetooth.service
 
 [Service]
 Type=oneshot
 ExecStart=/usr/bin/mount -o remount,rw /
-ExecStartPost=/bin/systemctl disable firstboot_rw.service
+ExecStartPost=/usr/bin/systemctl disable firstboot_rw.service
 RemainAfterExit=true
 
 [Install]
 WantedBy=basic.target
 EOF
-/bin/systemctl enable firstboot_rw.service
+/usr/bin/systemctl enable firstboot_rw.service
 
 cat << 'EOF' > /lib/systemd/system/firstboot_ro.service
 [Unit]
@@ -63,14 +67,15 @@ Description=Mount rootfs ro
 # Add first-boot rw services here
 After=firstboot_rw.service
 After=regenerate_ssh_host_keys.service
+After=bluetooth.service
 
 [Service]
 Type=oneshot
-ExecStartPre=/bin/systemctl disable firstboot_ro.service
+ExecStartPre=/usr/bin/systemctl disable firstboot_ro.service
 ExecStart=/usr/bin/mount -o remount,ro /
 RemainAfterExit=true
 
 [Install]
 WantedBy=basic.target
 EOF
-/bin/systemctl enable firstboot_ro.service
+/usr/bin/systemctl enable firstboot_ro.service

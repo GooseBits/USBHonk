@@ -41,7 +41,7 @@ then
     if [ ! -f "$RPI_ZIP" ]
     then
         echo "Downloading Raspberry Pi OS Image..."
-        wget -q "$RPI_ZIP_URL"
+        wget "$RPI_ZIP_URL"
     fi
     if ! tmp=$(sha256sum ./$RPI_ZIP | grep $RPI_ZIP_HASH);
     then

@@ -52,24 +52,5 @@ Type=simple
 WantedBy=bluetooth.target
 EOF
 
-##
-## Startup script for the bluetooth agent
-##
-cat << 'EOF' >> /lib/systemd/system/bt-agent.service
-[Unit]
-Description=Bluetooth Auth Agent
-After=bluetooth.service
-Requires=bluetooth.service
-
-[Service]
-ExecStart=/usr/bin/bt-agent -c NoInputNoOutput
-Type=simple
-# Bug in bt-agent doesn't catch SIGTERM properly
-KillSignal=SIGINT
-
-[Install]
-WantedBy=bluetooth.target
-EOF
-
-# Disable bluetooth by default
-systemctl disable bluetooth.service
+/usr/bin/systemctl enable bt-network
+/usr/bin/systemctl enable systemd-networkd
