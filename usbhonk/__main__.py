@@ -78,7 +78,7 @@ class MainPrompt(Cmd):
             razer.active = True
             print("Razer attack active")
 
-            time.sleep(10)
+            time.sleep(20)
 
             # Return to normal
             print("Returning to normal")

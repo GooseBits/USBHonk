@@ -17,10 +17,10 @@ class RazerAttack(USBGadget):
         ##
 
         # Configure settings
-        self.bcdDevice = 0x0100  # v1.0.0
-        self.bcdUSB = 0x0200    # USB 2.0
-        self.idVendor = 0x1532
-        self.idProduct = 0x023e  # Some randomly chosen value
+        self.bcdDevice = 0x0101  # v1.0.1
+        self.bcdUSB = 0x0200     # USB 2.0
+        self.idVendor = 0x1532   # Razer
+        self.idProduct = 0x0084  # Some product
 
         # Special values to make Windows happy
         self.bDeviceClass = 0xEF
@@ -34,22 +34,21 @@ class RazerAttack(USBGadget):
         self.english_strings.set("manufacturer", "Razer")
         self.english_strings.set("product", "Razer Mouse")
 
-        ##
-        # Add some functions
-        ##
-
         #
-        # HID Keyboard
+        # HID Devices
         #
-        self.hid = self.function(HID, "usb0")
-        if self.hid.protocol != 2:
-            self.hid.protocol = 2
-        if self.hid.subclass != 1:
-            self.hid.subclass = 1
-        if self.hid.report_length != 6:
-            self.hid.report_length = 6
-        if not self.hid.report_desc:
-            self.hid.report_desc = b"\x05\x01\x09\x02\xa1\x01\x09\x01\xa1\x00\x85\x01\x05\x09\x19\x01\x29\x03\x15\x00\x25\x01\x95\x03\x75\x01\x81\x02\x95\x01\x75\x05\x81\x03\x05\x01\x09\x30\x09\x31\x15\x81\x25\x7f\x75\x08\x95\x02\x81\x06\x95\x02\x75\x08\x81\x01\xc0\xc0\x05\x01\x09\x02\xa1\x01\x09\x01\xa1\x00\x85\x02\x05\x09\x19\x01\x29\x03\x15\x00\x25\x01\x95\x03\x75\x01\x81\x02\x95\x01\x75\x05\x81\x01\x05\x01\x09\x30\x09\x31\x15\x00\x26\xff\x7f\x95\x02\x75\x10\x81\x02\xc0\xc0"
+        self.hids = []
+        for i in range(0, 2):
+            hid = self.function(HID, f"usb{i}")
+            self.hids.append(hid)
+            if hid.protocol != 2:
+                hid.protocol = 2
+            if hid.subclass != 1:
+                hid.subclass = 1
+            if hid.report_length != 6:
+                hid.report_length = 6
+            if not hid.report_desc:
+                hid.report_desc = b"\x05\x01\x09\x02\xa1\x01\x09\x01\xa1\x00\x85\x01\x05\x09\x19\x01\x29\x03\x15\x00\x25\x01\x95\x03\x75\x01\x81\x02\x95\x01\x75\x05\x81\x03\x05\x01\x09\x30\x09\x31\x15\x81\x25\x7f\x75\x08\x95\x02\x81\x06\x95\x02\x75\x08\x81\x01\xc0\xc0\x05\x01\x09\x02\xa1\x01\x09\x01\xa1\x00\x85\x02\x05\x09\x19\x01\x29\x03\x15\x00\x25\x01\x95\x03\x75\x01\x81\x02\x95\x01\x75\x05\x81\x01\x05\x01\x09\x30\x09\x31\x15\x00\x26\xff\x7f\x95\x02\x75\x10\x81\x02\xc0\xc0"
 
         ##
         # Create the configuration
@@ -62,7 +61,8 @@ class RazerAttack(USBGadget):
         #
         # Link the functions to the configuration
         #
-        config.link_function(self.hid)
+        for hid in self.hids:
+            config.link_function(hid)
 
 
 if __name__ == '__main__':
