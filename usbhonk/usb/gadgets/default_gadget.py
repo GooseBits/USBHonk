@@ -20,7 +20,7 @@ class DefaultGadget(USBGadget):
         ##
 
         # Configure settings
-        self.bcdDevice = 0x0001  # v0.0.1
+        self.bcdDevice = 0x0002  # v0.0.1
         self.bcdUSB = 0x0200    # USB 2.0
         self.idVendor = 0x1d6b  # Linux Foundation
         self.idProduct = 0x7104  # Some randomly chosen value
@@ -43,7 +43,7 @@ class DefaultGadget(USBGadget):
         os_desc = self.os_desc
         os_desc.b_vendor_code = 0xcd
         os_desc.qw_sign = "MSFT100"
-        os_desc.use = False
+        os_desc.use = True
 
         ##
         # Add some functions
@@ -78,11 +78,13 @@ class DefaultGadget(USBGadget):
         self.lun0.read_only = True
         self.lun0.removable = True
         self.lun0.cdrom = False
+        self.lun0.inquiry_string = "Utilities"
 
         self.lun1 = self.mass_storage.lun(1)
-        self.lun0.read_only = False
-        self.lun0.removable = True
-        self.lun0.cdrom = False
+        self.lun1.read_only = False
+        self.lun1.removable = True
+        self.lun1.cdrom = False
+        self.lun1.inquiry_string = "Secure Storage"     
 
         #
         # ACM Serial
