@@ -1,6 +1,7 @@
 """Handle secure storage."""
 import os
 import subprocess
+import time
 
 from subprocess import CalledProcessError, Popen, PIPE
 
@@ -28,16 +29,25 @@ class SecureStorage:
             return True
 
         # Send the password to cryptsetup
-        cmd = ['/usr/bin/sudo', '/usr/sbin/cryptsetup', 'luksOpen', self.path, self.name, '-d', '-']
+        cmd = ['/usr/sbin/cryptsetup', 'luksOpen', self.path, self.name, '-d', '-']
         with Popen(cmd, stdout=PIPE, stdin=PIPE, stderr=PIPE) as proc:
-            proc.communicate(password.encode())
-            return proc.returncode == 0
+            output, err = proc.communicate(password.encode())
+            if proc.returncode != 0:
+                print(f"luksOpen returned {proc.returncode}", output, err)
+                return False
+            return True
 
-    def deactivate(self) -> None:
+    def deactivate(self) -> bool:
         """Deactivate the mapping."""
         if not self.active():
-            return
-        subprocess.check_call(["/usr/bin/sudo", "/usr/sbin/cryptsetup", "luksClose", self.name], shell=True)
+            return True
+        try:
+            subprocess.check_call(["/usr/sbin/cryptsetup", "luksClose", self.name])
+        except CalledProcessError as exc:
+            print(f"Failed to call luksClose. {exc}")
+            return False
+
+        return True
 
     def init(self, password: str) -> None:
         """Reinitialize storage with a new password."""
@@ -46,24 +56,26 @@ class SecureStorage:
             return
 
         # Format the LUKS container
-        try:
-            subprocess.run(
-                f'echo "{password}"| /usr/bin/sudo /usr/sbin/cryptsetup -q luksFormat {self.path}',
-                shell=True, check=True)
-        except CalledProcessError as exc:
-            print(f"Failed to format (luksFormat). {exc}")
-            return
+        cmd = ['/usr/sbin/cryptsetup', '-q', 'luksFormat', self.path]
+        with Popen(cmd, stdout=PIPE, stdin=PIPE, stderr=PIPE) as proc:
+            output, err = proc.communicate(password.encode())
+            if proc.returncode != 0:
+                print(f"luksFormat returned {proc.returncode}", output, err)
+                return
 
         # Activate it
-        self.activate(password)
+        if not self.activate(password):
+            print(f"Failed to activate {self.mapping}")
+            return
 
         # Format it
         try:
-            subprocess.check_call(["/usr/bin/sudo", "/usr/sbin/mkfs.vfat", "-n", "SECURE", self.mapping], shell=True)
+            subprocess.check_call(["/usr/sbin/mkfs.vfat", "-n", "SECURE", self.mapping])
+            os.sync()
+            time.sleep(2)
         except CalledProcessError as exc:
             print(f"Failed to format. {exc}")
+        finally:
+            # Deactivate it
             self.deactivate()
-            return
 
-        # Deactivate it
-        self.deactivate()

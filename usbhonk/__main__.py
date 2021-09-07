@@ -5,18 +5,19 @@ from getpass import getpass
 
 from cmd import Cmd
 
+from usbhonk.usb.gadgets.default_gadget import DefaultGadget
 from usbhonk.secure_storage import SecureStorage
 from usbhonk.wifi.wpa import WPAConfig
 
 
 def open_rw():
     """Open mount as read/writable."""
-    subprocess.run("/usr/bin/sudo /usr/bin/mount -o remount,rw /", shell=True, check=True)
+    subprocess.run("/usr/bin/mount -o remount,rw /", shell=True, check=True)
 
 
 def close_rw():
     """Remount mount as read-only."""
-    subprocess.run("/usr/bin/sudo /usr/bin/mount -o remount,ro /", shell=True, check=True)
+    subprocess.run("/usr/bin/mount -o remount,ro /", shell=True, check=True)
 
 
 def get_new_password():
@@ -37,6 +38,7 @@ class MainPrompt(Cmd):
     intro = "Welcome! Type ? to list commands"
     secure_storage = SecureStorage("/dev/mmcblk0p3", "secure")
     wpa_config = WPAConfig()
+    default_gadget = DefaultGadget()
 
     def do_shell(self, _inp: str) -> None:
         """
@@ -57,7 +59,12 @@ class MainPrompt(Cmd):
             open
             close
         """
-        if inp == "init":
+        if not inp:
+            print("A command is required: ")
+            print("init\nopen\nclose")
+            return
+        
+        if inp == "init":            
             print("This will reinitialize your secure storage. ")
             print("All data will be erased.")
             if not input("Are you SURE? Type YES to continue: ") == "YES":
@@ -75,11 +82,18 @@ class MainPrompt(Cmd):
                 return
             if self.secure_storage.activate(passwd):
                 print("Success")
+                # Now attach it as mass storage on lun1
+                self.default_gadget.lun1.file = self.secure_storage.mapping
             else:
                 print("Failed to unlock")
 
         elif inp == "close":
+            if self.default_gadget.lun1.file:
+                print("Eject the disk from the host first")
+                return
             self.secure_storage.deactivate()
+        else:
+            print("Unknown subcommand")
 
     def do_wifi(self, inp: str) -> None:
         """

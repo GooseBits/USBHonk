@@ -23,7 +23,7 @@ cat << EOF > ${VENV}/bin/shell.sh
 ##
 ## Wrapper script for the goose user's shell
 ##
-${VENV}/bin/python3 -m usbhonk
+/usr/bin/sudo ${VENV}/bin/python3 -m usbhonk
 EOF
 chmod +x "${VENV}/bin/shell.sh"
 

@@ -22,7 +22,7 @@ class ConfigFSWrapper:
 
     def get_str_val(self, name : str) -> str:
         p = self.path / name
-        return p.read_text().strip()
+        return p.read_text().strip(" \n\t\x00")
 
     def set_str_val(self, name : str, value : str):
         p = self.path / name

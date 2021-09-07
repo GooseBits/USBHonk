@@ -113,7 +113,7 @@ class WPAConfig:
 
     def _run_wpa_cli(self, command) -> str:
         """Run a wpa_cli command and return the output."""
-        args = ["/usr/bin/sudo", "/sbin/wpa_cli", "-i", self.iface]
+        args = ["/sbin/wpa_cli", "-i", self.iface]
         args.extend(command)
         result = subprocess.run(args=args,
             capture_output=True, text=True, check=False

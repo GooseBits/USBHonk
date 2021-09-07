@@ -34,13 +34,30 @@ class DefaultGadget(USBGadget):
 
         # Networking
         # TODO: This should be configurable to be ecm instead
+        host_addr = "6e:b1:d7:7f:bf:53"
+        dev_addr = "c6:a6:cd:44:25:be"
+
         self.rndis = self.function(RNDIS, "usb0")
+        # Done like this because if we try to write after the
+        # initial setup, we get an error, even if the value
+        # is the same.
+        if self.rndis.host_addr != host_addr:
+            self.rndis.host_addr = host_addr
+        if self.rndis.dev_addr != dev_addr:
+            self.rndis.dev_addr = dev_addr
 
         # Mass storage
         self.mass_storage = self.function(MassStorage, "usb0")
 
         self.lun0 = self.mass_storage.lun(0)
+        self.lun0.read_only = True
+        self.lun0.removable = True
+        self.lun0.cdrom = False
+
         self.lun1 = self.mass_storage.lun(1)
+        self.lun0.read_only = False
+        self.lun0.removable = True
+        self.lun0.cdrom = False
 
         # ACM Serial
         self.acm = self.function(ACM, "usb0")
