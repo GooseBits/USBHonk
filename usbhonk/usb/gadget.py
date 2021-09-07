@@ -46,6 +46,12 @@ class OSDesc(ConfigFSWrapper):
     def __init__(self, base_path: Path):
         ConfigFSWrapper.__init__(self, base_path / "os_desc")
 
+    def link_configuration(self, config: GadgetConfiguration):
+        """ Link a configuration into this os_desc """
+        target = self.path / config.path.name
+        if not target.exists():
+            target.symlink_to(config.path)
+
     @property
     def b_vendor_code(self) -> int:
         return self.get_int_val("b_vendor_code")
@@ -68,7 +74,7 @@ class OSDesc(ConfigFSWrapper):
 
     @use.setter
     def use(self, value: bool) -> None:
-        self.set_bool_val("use", value)                
+        self.set_bool_val("use", value)
 
 
 class USBGadget(ConfigFSWrapper):

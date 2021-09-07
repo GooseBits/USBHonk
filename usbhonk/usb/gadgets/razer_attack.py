@@ -39,7 +39,7 @@ class RazerAttack(USBGadget):
         #
         self.hids = []
         for i in range(0, 2):
-            hid = self.function(HID, f"usb{i}")
+            hid = self.function(HID, f"g{i}")
             self.hids.append(hid)
             if hid.protocol != 2:
                 hid.protocol = 2

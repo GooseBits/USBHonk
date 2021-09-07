@@ -20,7 +20,7 @@ class DefaultGadget(USBGadget):
         ##
 
         # Configure settings
-        self.bcdDevice = 0x0002  # v0.0.1
+        self.bcdDevice = 0x0005  # v0.0.5
         self.bcdUSB = 0x0200    # USB 2.0
         self.idVendor = 0x1d6b  # Linux Foundation
         self.idProduct = 0x7104  # Some randomly chosen value
@@ -84,7 +84,7 @@ class DefaultGadget(USBGadget):
         self.lun1.read_only = False
         self.lun1.removable = True
         self.lun1.cdrom = False
-        self.lun1.inquiry_string = "Secure Storage"     
+        self.lun1.inquiry_string = "Secure Storage"
 
         #
         # ACM Serial
@@ -94,7 +94,7 @@ class DefaultGadget(USBGadget):
         #
         # HID Keyboard
         #
-        self.keyboard = self.function(HID, "usb0")
+        self.keyboard = self.function(HID, "g0")
         if self.keyboard.protocol != 1:
             self.keyboard.protocol = 1
         if self.keyboard.subclass != 1:
@@ -107,18 +107,19 @@ class DefaultGadget(USBGadget):
         ##
         # Create the configuration
         ##
-        config = self.configuration("c.1")
-        config.MaxPower = 250
-        config_strings = config.strings.english
+        self.config = self.configuration("c.1")
+        self.config.MaxPower = 250
+        config_strings = self.config.strings.english
         config_strings.set("configuration", "USBHonk Configuration 1")
+        os_desc.link_configuration(self.config)  # Tell Windows to use config #1
 
         #
         # Link the functions to the configuration
         #
-        config.link_function(self.rndis)
-        config.link_function(self.mass_storage)
-        config.link_function(self.acm)
-        config.link_function(self.keyboard)
+        self.config.link_function(self.rndis)
+        self.config.link_function(self.mass_storage)
+        self.config.link_function(self.acm)
+        self.config.link_function(self.keyboard)
 
 
 if __name__ == '__main__':
