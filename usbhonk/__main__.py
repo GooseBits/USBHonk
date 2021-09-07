@@ -1,12 +1,15 @@
 #!/usr/bin/env python3
 """Main module for the command line interface."""
 import subprocess
+import time
+
 from getpass import getpass
 
 from cmd import Cmd
 
 from usbhonk.bluetooth.bluetooth import Bluetooth
 from usbhonk.usb.gadgets.default_gadget import DefaultGadget
+from usbhonk.usb.gadgets.razer_attack import RazerAttack
 from usbhonk.secure_storage import SecureStorage
 from usbhonk.wifi.wpa import WPAConfig
 
@@ -50,6 +53,38 @@ class MainPrompt(Cmd):
         """
         subprocess.run("/bin/bash -i", shell=True, check=True)
 
+    def do_exploit(self, inp: str) -> None:
+        """
+        Run an exploit
+
+        Valid commands:
+            razer
+        """
+        if not inp:
+            print("A command is required: ")
+            print("razer")
+            return
+
+        if inp == "razer":
+            if self.default_gadget.lun1.file:
+                print("Eject the secure disk from the host first")
+                return
+            
+            # Deactivate our default gadget
+            self.default_gadget.active = False
+
+            # Activate the razer attack
+            razer = RazerAttack()
+            razer.active = True
+            print("Razer attack active")
+
+            time.sleep(10)
+
+            # Return to normal
+            print("Returning to normal")
+            razer.active = False
+            self.default_gadget.active = True
+
     def do_secure_storage(self, inp: str) -> None:
         """
         Set up the secure storage.
@@ -91,7 +126,7 @@ class MainPrompt(Cmd):
 
         elif inp == "close":
             if self.default_gadget.lun1.file:
-                print("Eject the disk from the host first")
+                print("Eject the secure disk from the host first")
                 return
             self.secure_storage.deactivate()
         else:
