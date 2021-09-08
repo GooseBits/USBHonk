@@ -23,6 +23,7 @@ read -p "Is this the right device path (y/n)? [$devpath]: " answer
 if [ "$answer" == "y" ]; then
     echo "HOOOOOOONK! hope you don't need anything on $devpath"
     dd if=usbhonk.img of=$devpath bs=8M
+    sync
     exit 0
 fi
 
