@@ -25,7 +25,7 @@ if [ $EUID != 0 ]; then
     exit 1
 fi
 
-DEPENDENCIES=( kpartx qemu-arm-static unzip mkfs.ext4 resize2fs e2fsck tune2fs wget zerofree truncate sfdisk)
+DEPENDENCIES=( kpartx qemu-arm-static unzip mkfs.ext4 resize2fs e2fsck tune2fs wget zerofree truncate sfdisk jq)
 
 HAS_DEPS=1
 for i in "${DEPENDENCIES[@]}"

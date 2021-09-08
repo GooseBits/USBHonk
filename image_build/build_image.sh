@@ -53,8 +53,8 @@ then
 fi
 
 ## Build the wheel
-## TODO: Clean first so that there can't be multiple wheels?
 pushd ..
+rm -f ./dist/usbhonk*.whl
 python3 setup.py bdist_wheel --universal
 popd
 
