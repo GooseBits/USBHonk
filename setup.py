@@ -27,6 +27,7 @@ setup(
     # TODO: url='https://usbhonk.readthedocs.io/en/latest/',
     packages=['usbhonk', 'usbhonk.bluetooth', 'usbhonk.usb', 'usbhonk.usb.functions', 'usbhonk.usb.gadgets', 'usbhonk.wifi'],
     install_requires=requirements,
+    include_package_data=True,
     extras_require={
         'dev': dev_requirements
     },
