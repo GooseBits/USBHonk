@@ -28,6 +28,7 @@ tmpfs           /var/lib/dhcp           tmpfs   defaults,nosuid,nodev         0 
 tmpfs           /var/lib/dhcpcd5        tmpfs   defaults,nosuid,nodev         0       0
 tmpfs           /run                    tmpfs   defaults,nosuid,nodev         0       0
 tmpfs           /tmp                    tmpfs   defaults,nosuid,nodev         0       0
+tmpfs           /var/tmp                tmpfs   defaults,nosuid,nodev         0       0
 tmpfs           /var/log                tmpfs   defaults,nosuid,nodev         0       0
 tmpfs           /var/spool              tmpfs   defaults,nosuid,nodev         0       0
 EOF
