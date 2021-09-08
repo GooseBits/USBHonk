@@ -69,7 +69,7 @@ class MainPrompt(Cmd):
             if self.default_gadget.lun1.file:
                 print("Eject the secure disk from the host first")
                 return
-            
+
             # Deactivate our default gadget
             self.default_gadget.active = False
 
@@ -100,8 +100,8 @@ class MainPrompt(Cmd):
             print("A command is required: ")
             print("init\nopen\nclose")
             return
-        
-        if inp == "init":            
+
+        if inp == "init":
             print("This will reinitialize your secure storage. ")
             print("All data will be erased.")
             if not input("Are you SURE? Type YES to continue: ") == "YES":
@@ -162,7 +162,6 @@ class MainPrompt(Cmd):
                 self.bluetooth.pair()
             finally:
                 close_rw()
-
 
     def do_wifi(self, inp: str) -> None:
         """
