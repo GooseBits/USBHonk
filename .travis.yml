@@ -17,14 +17,11 @@ jobs:
         - mypy usbhonk
       after_success:
         coveralls
-
     - stage: spell
       language: node_js
       node_js:
         - 14
-
       install:
         - npm install cspell
-
       script:
         - npx cspell usbhonk/**/*.py docs/*.rst CHANGELOG.md README.md setup.py
