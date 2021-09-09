@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 """Main module for the command line interface."""
+from os import close
 import subprocess
 import time
 
@@ -52,6 +53,40 @@ class MainPrompt(Cmd):
         :raises CalledProcessError: If we can't run /bin/bash
         """
         subprocess.run("/bin/bash -i", shell=True, check=True)
+
+    def do_ssh(self, inp: str) -> None:
+        """
+        Enable or disable SSH server on boot
+
+        Valid commands:
+            enable
+            disable
+        """
+        if not inp:
+            print("A command is required: ")
+            print("enable\ndisable")
+            return
+
+        if inp == "enable":
+            open_rw()
+            try:
+                subprocess.run("systemctl enable --now ssh", shell=True, check=True)
+                print("SSH enabled!")
+            except subprocess.CalledProcessError as exc:
+                print(f"Failed to enable ssh: {exc}")
+            finally:
+                close_rw()
+        elif inp == "disable":
+            open_rw()
+            try:
+                subprocess.run("systemctl disable --now ssh", shell=True, check=True)
+                print("SSH disabled!")
+            except subprocess.CalledProcessError as exc:
+                print(f"Failed to disable ssh: {exc}")
+            finally:
+                close_rw()
+        else:
+            print(f"Invalid input {inp}. Expected enable or disable")
 
     def do_exploit(self, inp: str) -> None:
         """

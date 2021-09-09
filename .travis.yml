@@ -24,4 +24,4 @@ jobs:
       install:
         - npm install cspell
       script:
-        - npx cspell usbhonk/**/*.py docs/*.rst CHANGELOG.md README.md setup.py
+        - npx cspell -u **/*.py **/*.md **/*.sh **/*.rst
