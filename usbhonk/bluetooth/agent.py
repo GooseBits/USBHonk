@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+"""Python bluetooth agent."""
 
 from __future__ import absolute_import, print_function, unicode_literals
 

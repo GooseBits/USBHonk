@@ -78,4 +78,3 @@ class SecureStorage:
         finally:
             # Deactivate it
             self.deactivate()
-

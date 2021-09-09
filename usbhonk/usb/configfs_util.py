@@ -1,6 +1,6 @@
 
 class ConfigFSWrapper:
-    """ Helper utilities for accessing configfs files """
+    """Helper utilities for accessing configfs files."""
 
     def __init__(self, path):
         self.path = path

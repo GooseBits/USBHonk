@@ -56,7 +56,7 @@ class MainPrompt(Cmd):
 
     def do_ssh(self, inp: str) -> None:
         """
-        Enable or disable SSH server on boot
+        Enable or disable SSH server on boot.
 
         Valid commands:
             enable

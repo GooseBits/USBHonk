@@ -28,7 +28,7 @@ class Network:
 
     def __str__(self):
         return f"Network(ssid={self.ssid} freq={self.freq}"\
-        f" signal={self.signal} encrypted={self.encrypted})"
+               f" signal={self.signal} encrypted={self.encrypted})"
 
 
 class WPAConfig:
@@ -89,7 +89,7 @@ class WPAConfig:
         for line in lines:
             line = line.strip()
             if line:
-                key,val = line.split("=", maxsplit=1)
+                key, val = line.split("=", maxsplit=1)
                 result[key] = val
         return result
 
@@ -115,9 +115,7 @@ class WPAConfig:
         """Run a wpa_cli command and return the output."""
         args = ["/sbin/wpa_cli", "-i", self.iface]
         args.extend(command)
-        result = subprocess.run(args=args,
-            capture_output=True, text=True, check=False
-        )
+        result = subprocess.run(args=args, capture_output=True, text=True, check=False)
         if result.returncode != 0:
             err_str = f"Error calling {' '.join(args)}: {result.stdout.strip()}"
             raise WPAException(err_str)

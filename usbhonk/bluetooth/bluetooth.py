@@ -5,13 +5,14 @@ from subprocess import CalledProcessError
 
 
 class Bluetooth:
-    """ Class for pairing new bluetooth connections """
+    """Class for pairing new bluetooth connections."""
 
     def __init__(self, device="hci0"):
+        """Create the bluetooth object."""
         self.device = device
 
     def pair(self):
-        """ Pair a new device """
+        """Pair a new device."""
         self.discoverable = True
         subprocess.run([sys.executable, "-m", "usbhonk.bluetooth.agent", "--adapter", self.device])
         self.discoverable = False

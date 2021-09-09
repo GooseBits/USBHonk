@@ -78,18 +78,18 @@ class OSDesc(ConfigFSWrapper):
 
 
 class USBGadget(ConfigFSWrapper):
-    """ USB Gadget Base Class """
+    """USB Gadget Base Class."""
 
     def __init__(self, gadget_name):
         ConfigFSWrapper.__init__(self, Path(f"/sys/kernel/config/usb_gadget/{gadget_name}"))
         self.path.mkdir(parents=True, exist_ok=True)
 
     def configuration(self, name: str) -> GadgetConfiguration:
-        """ Get or create a configuration """
+        """Get or create a configuration."""
         return GadgetConfiguration(self.path, name)
 
     def function(self, func_class: USBFunction, name: str = "usb0") -> USBFunction:
-        """ Get or create a function """
+        """Get or create a function."""
         return func_class(self.path, name)
 
     @property
@@ -98,7 +98,7 @@ class USBGadget(ConfigFSWrapper):
 
     @property
     def strings(self) -> Strings:
-        """ Get the strings folder for this gadget """
+        """Get the strings folder for this gadget."""
         return Strings(self.path)
 
     @property
