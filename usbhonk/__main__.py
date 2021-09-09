@@ -52,7 +52,7 @@ class MainPrompt(Cmd):
 
         :raises CalledProcessError: If we can't run /bin/bash
         """
-        subprocess.run("/bin/bash -i", shell=True, check=True)
+        subprocess.run("/bin/bash -i", shell=True)
 
     def do_ssh(self, inp: str) -> None:
         """
