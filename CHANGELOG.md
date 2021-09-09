@@ -8,3 +8,4 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 * Initial repo setup and PoC
+* Added travis CI yml and selected a plan for GooseBits so the build runs
