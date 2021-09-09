@@ -1,0 +1,30 @@
+jobs:
+  include:
+    - stage: lint
+      language: python
+      python:
+        - "3.6"
+        - "3.7"
+        - "3.8"
+        - "3.9"
+      install:
+        - pip install -r requirements/requirements.txt -r requirements/requirements-dev.txt coveralls
+      script:
+        - pytest
+        - pycodestyle usbhonk
+        - pydocstyle usbhonk
+        - pylint --rcfile=setup.cfg usbhonk
+        - mypy usbhonk
+      after_success:
+        coveralls
+
+    - stage: spell
+      language: node_js
+      node_js:
+        - 14
+
+      install:
+        - npm install cspell
+
+      script:
+        - npx cspell usbhonk/**/*.py docs/*.rst CHANGELOG.md README.md setup.py

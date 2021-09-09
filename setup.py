@@ -32,7 +32,7 @@ setup(
         'dev': dev_requirements
     },
     project_urls={
-        # TODO: 'Travis CI': 'TODO',
+        'Travis CI': 'https://app.travis-ci.com/github/GooseBits/USBHonk',
         # TODO: 'Documentation': 'https://usbhonk.readthedocs.io/en/latest/',
         'Source': 'https://github.com/GooseBits/USBHonk',
     },
