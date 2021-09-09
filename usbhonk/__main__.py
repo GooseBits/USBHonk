@@ -90,7 +90,7 @@ class MainPrompt(Cmd):
 
     def do_exploit(self, inp: str) -> None:
         """
-        Run an exploit
+        Run an exploit.
 
         Valid commands:
             razer
@@ -169,7 +169,7 @@ class MainPrompt(Cmd):
 
     def do_bluetooth(self, inp: str) -> None:
         """
-        Configure bluetooth connectivity
+        Configure bluetooth connectivity.
 
         bluetooth <command>
 
