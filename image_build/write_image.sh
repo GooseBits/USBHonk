@@ -85,9 +85,10 @@ then
         VENDOR=$(echo "$dev" | jq -r .vendor)
         MODEL=$(echo "$dev" | jq -r .model)
         DEV_PATH=$(echo "$dev" | jq -r .path)
-        echo "$VENDOR $MODEL - $DEV_PATH"
+        printf "%-25s [$DEV_PATH]\n" "$VENDOR $MODEL"
     done
 fi
+echo ""
 
 if [ ${#VALID_DEVICES[@]} == 0 ]; 
 then
