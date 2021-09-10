@@ -44,8 +44,13 @@ do
         continue
     fi
 
-    NAME=$(echo "$LSBLK_OUTPUT" | jq -r .blockdevices[$i].name)
+    READ_ONLY=$(echo "$LSBLK_OUTPUT" | jq -r .blockdevices[$i].ro)
+    if [ "$READ_ONLY" != "false" ];
+    then
+        continue
+    fi    
 
+    NAME=$(echo "$LSBLK_OUTPUT" | jq -r .blockdevices[$i].name)
     MOUNT=$(echo "$LSBLK_OUTPUT" | jq -r .blockdevices[$i].mountpoint)
     if [ "$MOUNT" != "null" ];
     then
