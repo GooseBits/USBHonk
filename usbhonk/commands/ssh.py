@@ -12,7 +12,7 @@ class SshCommand(Command):
 
     def __init__(self):
         self.parser = PypsiArgParser()
-        self.parser.add_argument('action', choices=('enable', 'disable'), action='store')
+        self.parser.add_argument('action', choices=('enable', 'disable'), action='store',)
 
         super().__init__(name='ssh', brief='control the SSH service',
                          usage=self.parser.format_usage())
@@ -35,7 +35,16 @@ class SshCommand(Command):
 
     @unlock_device
     def enable(self, shell: Shell) -> int:
-        return subprocess.check_call("systemctl enable --now ssh")
+        try:
+            rc = subprocess.check_call("systemctl enable --now ssh")
+        except subprocess.CalledProcessError as err:
+            rc = err.returncode
+        return rc
 
+    @unlock_device
     def disable(self, shell: Shell) -> int:
-        return subprocess.check_call("systemctl disable --now ssh")
+        try:
+            rc = subprocess.check_call("systemctl disable --now ssh")
+        except subprocess.CalledProcessError as err:
+            rc = err.returncode
+        return rc
