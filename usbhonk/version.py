@@ -1,3 +1,5 @@
 """USBHonk version file."""
+from pathlib import Path
 
-__version__ = "0.0.1"
+
+version = open(Path(__file__).parent / 'VERSION', 'r').readline()

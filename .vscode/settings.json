@@ -1,5 +1,4 @@
 {
-    "python.pythonPath": "venv\\Scripts\\python.exe",
     "python.linting.banditEnabled": false,
     "python.linting.flake8Enabled": false,
     "python.linting.mypyEnabled": false,
@@ -8,5 +7,12 @@
     "python.linting.pydocstyleEnabled": false,
     "python.linting.pylamaEnabled": false,
     "python.linting.pylintEnabled": true,
-    "python.linting.enabled": true
+    "python.linting.enabled": true,
+    "editor.rulers": [
+        99
+    ],
+    "trailing-spaces.trimOnSave": true,
+    "files.trimTrailingWhitespace": true,
+    "files.insertFinalNewline": true,
+    "files.eol": "\n"
 }

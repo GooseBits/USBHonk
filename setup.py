@@ -1,9 +1,7 @@
 """Setup script."""
 import os
+from pathlib import Path
 from setuptools import setup
-
-from usbhonk.version import __version__
-
 
 def load_requirements(filename):
     path = os.path.join(os.path.dirname(__file__), 'requirements', filename)
@@ -13,11 +11,12 @@ def load_requirements(filename):
 
 requirements = load_requirements('requirements.txt')
 dev_requirements = load_requirements('requirements-dev.txt')
+version = open(Path(__file__).parent / 'usbhonk' / 'VERSION', 'r').readline()
 
 
 setup(
     name='usbhonk',
-    version=__version__,
+    version=version,
     license='GPLv3',
     description='HOOOOOONK! Now for USB.',
     long_description=open("README.md", 'r').read(),
