@@ -1,1 +1,1 @@
-pypsi
+git+https://github.com/ameily/pypsi.git@master  # pull bleeding edge! what could go wrong?!
