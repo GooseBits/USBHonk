@@ -1,4 +1,9 @@
 import subprocess
+from getpass import getpass
+from contextlib import contextmanager
+
+from pypsi.ansi import AnsiCodes
+
 
 def open_rw():
     """Open mount as read/writable."""
@@ -10,17 +15,25 @@ def close_rw():
     subprocess.check_call("/usr/bin/mount -o remount,ro /")
 
 
+@contextmanager
 def unlock_device(func: callable) -> callable:
     '''
     Decorator to  unlock the root filesystem for the duration of the function call.
     '''
-    def wrapper(*args, **kwargs):
-        open_rw()
-        try:
-            ret = func()
-        finally:
-            close_rw()
+    open_rw()
+    try:
+        yield
+    finally:
+        close_rw()
 
-        return ret
 
-    return wrapper
+def get_new_password():
+    """Get the user's new password."""
+    passwd1 = getpass(prompt="New Password: ")
+    passwd2 = getpass(prompt="Verify New Password: ")
+
+    if passwd1 != passwd2:
+        print(AnsiCodes.red('error: passwords do not match'))
+        return None
+
+    return passwd1

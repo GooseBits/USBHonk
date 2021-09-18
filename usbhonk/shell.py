@@ -13,7 +13,8 @@ from pypsi.plugins.history import HistoryPlugin
 from pypsi.plugins.multiline import MultilinePlugin
 from pypsi.plugins.variable import VariablePlugin
 
-from .commands.ssh import SshCommand
+from .commands import *
+from .usb.gadgets.default_gadget import DefaultGadget
 
 
 BANNER = '''
@@ -65,13 +66,19 @@ class HonkShell(Shell):
     multiline_plugin = MultilinePlugin()
     variable_plugin = VariablePlugin()
 
+    bluetooth_cmd = BluetoothCommand()
+    exploit_cmd = ExploitCommand()
+    secure_storage_cmd = SecureStorageCommand()
     ssh_cmd = SshCommand()
+    wifi_cmd = WifiCommand()
+
 
     def get_current_prompt(self):
         return f'\x1b[1;36mhonk \x1b[1;35m>\x1b[0m '
 
     def on_shell_ready(self):
         self.fallback_cmd = self.system_cmd
+        self.ctx.default_gadget = DefaultGadget()
         print(BANNER)
 
 
