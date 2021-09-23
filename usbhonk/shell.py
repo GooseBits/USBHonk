@@ -15,10 +15,10 @@ from pypsi.plugins.variable import VariablePlugin
 
 from .commands import *
 from .usb.gadgets.default_gadget import DefaultGadget
+from .version import version as USB_HONK_VERSION
 
 
-BANNER = '''
-======================================================================================
+BANNER = f'''
   _    _  _____ ____       \x1b[1;31m_    _             _\x1b[0m
  | |  | |/ ____|  _ \\     \x1b[1;31m| |  | |           | |\x1b[0m
  | |  | | (___ | |_) |    \x1b[1;31m| |__| | ___  _ __ | | __\x1b[0m
@@ -48,7 +48,7 @@ BANNER = '''
                  \\   --<
                   `.`.<
                     `-'
-======================================================================================
+                                          \x1b[1;35mv{USB_HONK_VERSION}
 '''
 
 
@@ -66,6 +66,7 @@ class HonkShell(Shell):
     multiline_plugin = MultilinePlugin()
     variable_plugin = VariablePlugin()
 
+    # Honk commands
     bluetooth_cmd = BluetoothCommand()
     exploit_cmd = ExploitCommand()
     secure_storage_cmd = SecureStorageCommand()

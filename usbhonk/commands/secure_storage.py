@@ -3,6 +3,7 @@ from getpass import getpass
 from pypsi.core import Command, PypsiArgParser, CommandShortCircuit
 from pypsi.shell import Shell
 from pypsi.ansi import AnsiCodes
+from pypsi.completers import command_completer
 
 from usbhonk.control import get_new_password
 from usbhonk.secure_storage import SecureStorage
@@ -19,6 +20,9 @@ class SecureStorageCommand(Command):
 
     def setup(self, shell: Shell) -> None:
         shell.ctx.secure_storage = SecureStorage(path="/dev/mmcblk0p3", name="secure")
+
+    def complete(self, shell, args, prefix):
+        return command_completer(self.parser, shell, args, prefix, case_sensitive=True)
 
     def run(self, shell: Shell, params: List[str]) -> int:
         try:

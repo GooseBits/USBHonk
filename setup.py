@@ -24,7 +24,8 @@ setup(
     author='GooseBits',
     author_email='contact@goosebits.io',
     # TODO: url='https://usbhonk.readthedocs.io/en/latest/',
-    packages=['usbhonk', 'usbhonk.bluetooth', 'usbhonk.usb', 'usbhonk.usb.functions', 'usbhonk.usb.gadgets', 'usbhonk.wifi'],
+    packages=['usbhonk', 'usbhonk.bluetooth', 'usbhonk.usb', 'usbhonk.usb.functions',
+              'usbhonk.usb.gadgets', 'usbhonk.wifi', 'usbhonk.commands'],
     install_requires=requirements,
     include_package_data=True,
     extras_require={
